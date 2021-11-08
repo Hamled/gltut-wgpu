@@ -5,3 +5,4 @@ authors = ["Charles Ellis <hamled@hamled.dev>"]
 edition = "2021"
 
 [dependencies]
+winit = { version = "0.25", default-features = false, features = ["wayland"] }
