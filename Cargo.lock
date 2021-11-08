@@ -414,6 +414,7 @@ dependencies = [
 name = "gltut-wgpu"
 version = "0.1.0"
 dependencies = [
+ "pollster",
  "wgpu",
  "winit",
 ]
@@ -824,6 +825,12 @@ name = "pkg-config"
 version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12295df4f294471248581bc09bef3c38a5e46f1e36d6a37353621a0c6c357e1f"
+
+[[package]]
+name = "pollster"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb20dcc30536a1508e75d47dd0e399bb2fe7354dcf35cda9127f2bf1ed92e30e"
 
 [[package]]
 name = "proc-macro-crate"
