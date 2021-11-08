@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 winit = { version = "0.25", default-features = false, features = ["wayland"] }
+wgpu = "0.11"
