@@ -1,3 +1,6 @@
+use winit::{event_loop::EventLoop, window::WindowBuilder};
+
 fn main() {
-    println!("Hello, world!");
+    let event_loop = EventLoop::new();
+    let _window = WindowBuilder::new().build(&event_loop).unwrap();
 }
