@@ -53,7 +53,11 @@ impl<'window> Renderer<'window> {
 
     // Clear the color buffer immediately
     pub fn clear_immediate(&mut self, color: Color) {
-        let texture = self.surface.get_current_texture().unwrap();
+        let texture = match self.surface.get_current_texture() {
+            Ok(texture) => texture,
+            Err(wgpu::SurfaceError::Timeout) => return,
+            Err(e) => panic!("Got error from get_current_texture(): {}", e),
+        };
 
         let mut encoder = self
             .device
