@@ -2,15 +2,14 @@ use pollster::block_on;
 use wgpu::{Color, Device, Queue, Surface};
 use winit::window::Window;
 
-pub struct Renderer<'window> {
+pub struct Renderer {
     surface: Surface,
     device: Device,
     queue: Queue,
-    phantom_window: std::marker::PhantomData<&'window Window>,
 }
 
-impl<'window> Renderer<'window> {
-    pub fn new(window: &'window Window) -> Self {
+impl Renderer {
+    pub fn new(window: &Window) -> Self {
         let instance = wgpu::Instance::new(wgpu::Backends::VULKAN);
         let surface = unsafe { instance.create_surface(window) };
 
@@ -47,7 +46,6 @@ impl<'window> Renderer<'window> {
             surface,
             device,
             queue,
-            phantom_window: std::marker::PhantomData,
         }
     }
 
