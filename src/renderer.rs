@@ -1,18 +1,20 @@
 use pollster::block_on;
+use std::rc::Rc;
 use wgpu::{Color, Device, Queue, Surface};
 use winit::window::Window;
 
-pub struct Renderer<'window> {
+pub struct Renderer {
+    #[allow(dead_code)]
+    window: Rc<Window>,
     surface: Surface,
     device: Device,
     queue: Queue,
-    phantom_window: std::marker::PhantomData<&'window Window>,
 }
 
-impl<'window> Renderer<'window> {
-    pub fn new(window: &'window Window) -> Self {
+impl Renderer {
+    pub fn new(window: Rc<Window>) -> Self {
         let instance = wgpu::Instance::new(wgpu::Backends::VULKAN);
-        let surface = unsafe { instance.create_surface(window) };
+        let surface = unsafe { instance.create_surface(&*window) };
 
         let adapter = block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::default(),
@@ -44,10 +46,10 @@ impl<'window> Renderer<'window> {
         );
 
         Renderer {
+            window,
             surface,
             device,
             queue,
-            phantom_window: std::marker::PhantomData,
         }
     }
 
