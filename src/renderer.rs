@@ -1,27 +1,27 @@
 use pollster::block_on;
-use wgpu::{Device, Queue, Surface};
+use wgpu::{Color, Device, Queue, Surface};
 use winit::window::Window;
 
 pub struct Renderer<'window> {
-    _surface: Surface,
-    _device: Device,
-    _queue: Queue,
+    surface: Surface,
+    device: Device,
+    queue: Queue,
     phantom_window: std::marker::PhantomData<&'window Window>,
 }
 
 impl<'window> Renderer<'window> {
     pub fn new(window: &'window Window) -> Self {
         let instance = wgpu::Instance::new(wgpu::Backends::VULKAN);
-        let _surface = unsafe { instance.create_surface(window) };
+        let surface = unsafe { instance.create_surface(window) };
 
         let adapter = block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::default(),
-            compatible_surface: Some(&_surface),
+            compatible_surface: Some(&surface),
             force_fallback_adapter: false,
         }))
         .unwrap();
 
-        let (_device, _queue) = block_on(adapter.request_device(
+        let (device, queue) = block_on(adapter.request_device(
             &wgpu::DeviceDescriptor {
                 label: Some("gltut Device"),
                 features: wgpu::Features::default(),
@@ -44,10 +44,39 @@ impl<'window> Renderer<'window> {
         );
 
         Renderer {
-            _surface,
-            _device,
-            _queue,
+            surface,
+            device,
+            queue,
             phantom_window: std::marker::PhantomData,
         }
+    }
+
+    // Clear the color buffer immediately
+    pub fn clear_immediate(&mut self, color: Color) {
+        let texture = self.surface.get_current_texture().unwrap();
+
+        let mut encoder = self
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("clear_immediate"),
+            });
+
+        encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("clear_immediate"),
+            color_attachments: &[wgpu::RenderPassColorAttachment {
+                view: &texture
+                    .texture
+                    .create_view(&wgpu::TextureViewDescriptor::default()),
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(color),
+                    store: true,
+                },
+            }],
+            depth_stencil_attachment: None,
+        });
+
+        self.queue.submit(std::iter::once(encoder.finish()));
+        texture.present();
     }
 }
