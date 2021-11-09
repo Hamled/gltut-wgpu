@@ -31,6 +31,18 @@ impl<'window> Renderer<'window> {
         ))
         .unwrap();
 
+        let size = window.inner_size();
+        surface.configure(
+            &device,
+            &wgpu::SurfaceConfiguration {
+                usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+                format: surface.get_preferred_format(&adapter).unwrap(),
+                width: size.width,
+                height: size.height,
+                present_mode: wgpu::PresentMode::Fifo,
+            },
+        );
+
         Renderer {
             _surface,
             _device,
