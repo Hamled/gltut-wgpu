@@ -26,12 +26,8 @@ fn main() {
     let mut app = App::new(window);
 
     event_loop.run(move |_event, _target, control_flow| {
-        app.renderer.clear_immediate(wgpu::Color {
-            r: 0.1,
-            g: 0.2,
-            b: 0.3,
-            a: 1.0,
-        });
+        app.renderer.ch1_draw();
+
         *control_flow = ControlFlow::Wait;
     });
 }
