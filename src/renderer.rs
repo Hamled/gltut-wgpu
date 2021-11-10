@@ -159,22 +159,6 @@ impl Renderer {
             self.device.create_render_pipeline(&desc)
         };
 
-        let verts = {
-            let verts = vec![
-                vec4(0.75, 0.75, 0.0, 1.0),
-                vec4(0.75, -0.75, 0.0, 1.0),
-                vec4(-0.75, -0.75, 0.0, 1.0),
-            ];
-
-            let desc = wgpu::util::BufferInitDescriptor {
-                label: Some("Ch1 Vertex Buffer"),
-                usage: wgpu::BufferUsages::VERTEX,
-                contents: transmute_to_bytes(verts.as_slice()),
-            };
-
-            self.device.create_buffer_init(&desc)
-        };
-
         let texture = match self.surface.get_current_texture() {
             Ok(texture) => texture,
             Err(wgpu::SurfaceError::Timeout) => return,
@@ -191,7 +175,7 @@ impl Renderer {
                 label: Some("Ch1 Encoder"),
             });
 
-        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+        let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Ch1 Render Pass"),
             color_attachments: &[wgpu::RenderPassColorAttachment {
                 view: &output,
@@ -205,11 +189,28 @@ impl Renderer {
         });
 
         // Draw the vertices with simple indices, 1 instance
-        render_pass.set_pipeline(&pipeline);
-        render_pass.set_vertex_buffer(0, verts.slice(..));
-        render_pass.draw(0..3, 0..1);
+        {
+            let verts = {
+                let verts = vec![
+                    vec4(0.75, 0.75, 0.0, 1.0),
+                    vec4(0.75, -0.75, 0.0, 1.0),
+                    vec4(-0.75, -0.75, 0.0, 1.0),
+                ];
 
-        drop(render_pass);
+                let desc = wgpu::util::BufferInitDescriptor {
+                    label: Some("Ch1 Vertex Buffer"),
+                    usage: wgpu::BufferUsages::VERTEX,
+                    contents: transmute_to_bytes(verts.as_slice()),
+                };
+
+                self.device.create_buffer_init(&desc)
+            };
+
+            let mut render_pass = render_pass;
+            render_pass.set_pipeline(&pipeline);
+            render_pass.set_vertex_buffer(0, verts.slice(..));
+            render_pass.draw(0..3, 0..1);
+        }
 
         self.queue.submit(std::iter::once(encoder.finish()));
         texture.present();
