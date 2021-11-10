@@ -1,6 +1,15 @@
 use pollster::block_on;
 use wgpu::{Color, Device, Queue, Surface};
+use safe_transmute::{transmute_to_bytes, TriviallyTransmutable};
 use winit::window::Window;
+
+#[derive(Clone, Copy)]
+struct Vector4(cgmath::Vector4<f32>);
+unsafe impl TriviallyTransmutable for Vector4 {}
+
+fn vec4(x: f32, y: f32, z: f32, w: f32) -> Vector4 {
+    Vector4(cgmath::vec4(x, y, z, w))
+}
 
 pub struct Renderer {
     surface: Surface,
