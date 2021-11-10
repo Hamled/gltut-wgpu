@@ -1,6 +1,6 @@
 use pollster::block_on;
-use wgpu::{Color, Device, Queue, Surface};
 use safe_transmute::{transmute_to_bytes, TriviallyTransmutable};
+use wgpu::{Color, Device, Queue, Surface, SurfaceConfiguration};
 use winit::window::Window;
 
 #[derive(Clone, Copy)]
@@ -15,6 +15,7 @@ pub struct Renderer {
     surface: Surface,
     device: Device,
     queue: Queue,
+    config: SurfaceConfiguration,
 }
 
 impl Renderer {
@@ -40,21 +41,20 @@ impl Renderer {
         .unwrap();
 
         let size = window.inner_size();
-        surface.configure(
-            &device,
-            &wgpu::SurfaceConfiguration {
-                usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-                format: surface.get_preferred_format(&adapter).unwrap(),
-                width: size.width,
-                height: size.height,
-                present_mode: wgpu::PresentMode::Fifo,
-            },
-        );
+        let config = wgpu::SurfaceConfiguration {
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            format: surface.get_preferred_format(&adapter).unwrap(),
+            width: size.width,
+            height: size.height,
+            present_mode: wgpu::PresentMode::Fifo,
+        };
+        surface.configure(&device, &config);
 
         Renderer {
             surface,
             device,
             queue,
+            config,
         }
     }
 
